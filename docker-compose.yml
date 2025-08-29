@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  app:
+    container_name: EffectiveMobileBank
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9191:9191"
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/effective_bank
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
+    networks:
+      - app-network
+
+  db:
+    container_name: effective_bank
+    image: postgres:15
+    environment:
+      POSTGRES_DB: effective_bank
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  app-network:
+    driver: bridge

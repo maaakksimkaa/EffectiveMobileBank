@@ -1,0 +1,213 @@
+openapi: 3.0.3
+info:
+  title: Effective Mobile Bank API
+  version: 1.0.0
+paths:
+  /api/auth/login:
+    post:
+      summary: Login and get JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username: { type: string }
+                password: { type: string }
+      responses:
+        '200': { description: OK }
+  /api/auth/register:
+    post:
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username: { type: string }
+                password: { type: string }
+      responses:
+        '200': { description: OK }
+  /api/cards:
+    get:
+      summary: List own cards
+      parameters:
+        - in: query
+          name: status
+          schema: { type: string, enum: [ACTIVE, BLOCKED, EXPIRED] }
+        - in: query
+          name: page
+          schema: { type: integer }
+        - in: query
+          name: size
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+  /api/cards/{id}/block:
+    post:
+      summary: Block own card
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: OK }
+  /api/cards/transfer:
+    post:
+      summary: Transfer between own cards
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fromCardId: { type: string, format: uuid }
+                toCardId: { type: string, format: uuid }
+                amount: { type: number, format: double }
+      responses:
+        '200': { description: OK }
+  /api/cards/{id}/topup:
+    post:
+      summary: Top up own card (USER)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount: { type: number, format: double }
+      responses:
+        '200': { description: OK }
+  /api/admin/cards:
+    post:
+      summary: Create card for user (ADMIN)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ownerId: { type: string, format: uuid }
+                plainPan: { type: string }
+                expiry: { type: string, format: date }
+      responses:
+        '200': { description: OK }
+    get:
+      summary: List cards (ADMIN)
+      parameters:
+        - in: query
+          name: username
+          schema: { type: string }
+        - in: query
+          name: status
+          schema: { type: string, enum: [ACTIVE, BLOCKED, EXPIRED] }
+        - in: query
+          name: page
+          schema: { type: integer }
+        - in: query
+          name: size
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+  /api/admin/cards/{id}:
+    delete:
+      summary: Delete card (ADMIN)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: OK }
+  /api/admin/cards/{id}/topup:
+    post:
+      summary: Top up any card (ADMIN)
+  /api/admin/cards/{id}/activate:
+    post:
+      summary: Activate card (ADMIN)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: OK }
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount: { type: number, format: double }
+      responses:
+        '200': { description: OK }
+  /api/admin/users:
+    post:
+      summary: Create user (ADMIN)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username: { type: string }
+                password: { type: string }
+                roles:
+                  type: array
+                  items: { type: string, enum: [ADMIN, USER] }
+      responses:
+        '200': { description: OK }
+    get:
+      summary: List users (ADMIN)
+      responses:
+        '200': { description: OK }
+  /api/admin/users/{id}/roles:
+    patch:
+      summary: Update user roles (ADMIN)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                roles:
+                  type: array
+                  items: { type: string, enum: [ADMIN, USER] }
+      responses:
+        '200': { description: OK }
+  /api/admin/users/{id}:
+    delete:
+      summary: Delete user (ADMIN)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: OK }
+
